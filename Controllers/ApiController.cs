@@ -52,9 +52,31 @@ public class ApiController : Controller
         }
     }
     [HttpPut]
-    public async Task<string> TakeMoney()
+    public string TakeMoney(ulong steam, double money)
     {
-        if (Authorized(Response)==false)
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        user.MoneyAmount -= money;
+        _db.SaveChanges();
+        return "Code 1";
+    }
+    public string PutMoney(ulong steam, double money)
+    {
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        user.MoneyAmount += money;
+        _db.SaveChanges();
+        return "Code 1";
+    }
+    public async Task<string> AddItem()
+    {
+        if (Authorized(Response) == false)
         {
             Response.StatusCode = 401;
         }
@@ -62,19 +84,5 @@ public class ApiController : Controller
         _db.Items.Add(item);
         _db.SaveChanges();
         return "Code 1";
-    }
-    public string PutMoney()
-    {
-        return "";
-    }
-
-    public string AddItem()
-    {
-        return "";
-    }
-
-    public string RemoveItem()
-    {
-        return "";
     }
 }
