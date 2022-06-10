@@ -51,7 +51,7 @@ public class ApiController : Controller
             return false;
         }
     }
-    [HttpPut]
+    [HttpPost]
     public string TakeMoney(ulong steam, double money)
     {
         if (Authorized(Response) == false)
@@ -63,6 +63,7 @@ public class ApiController : Controller
         _db.SaveChanges();
         return "Code 1";
     }
+    [HttpPost]
     public string PutMoney(ulong steam, double money)
     {
         if (Authorized(Response) == false)
@@ -70,16 +71,26 @@ public class ApiController : Controller
             Response.StatusCode = 401;
         }
         var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        if (user == null) _db.Users.Add(new User { MoneyAmount = 0, SteamID = steam });
         user.MoneyAmount += money;
         _db.SaveChanges();
         return "Code 1";
     }
+    private ulong GetSteamID()
+    {
+        string SteamURL = User.Claims.ToList()[0].Value;
+        Regex regex = new Regex(@"7\d*");
+        var matches = regex.Matches(SteamURL);
+        return ulong.Parse(matches[0].Value);
+    }
+    [HttpPost]
     public async Task<string> AddItem()
     {
         if (Authorized(Response) == false)
         {
             Response.StatusCode = 401;
         }
+        
         var item = await Request.ReadFromJsonAsync<Item>();
         _db.Items.Add(item);
         _db.SaveChanges();
