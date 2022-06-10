@@ -1,20 +1,8 @@
 ﻿
 <div class="jumbotron">
 
-    
     @if (User?.Identity?.IsAuthenticated ?? false)
     {
-        @foreach (var item in ViewBag.Items)
-        {
-        <div class="sellitem">
-            <div class="id" asp-for="id">@item.ID</div>
-            <input asp-for="id" value="@item.ID" type="hidden" />
-            <div class="cost">@item.Cost</div>
-            <div class="name">@item.Name</div>
-            <div class="item_id">@item.ItemID</div>
-            <a href="~/Home/Buy/@item.ID">Купить</a>
-        </div>
-        }
         <h1>Welcome, @User.Identity.Name</h1>
 
         <p>
