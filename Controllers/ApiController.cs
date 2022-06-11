@@ -133,7 +133,7 @@ public class ApiController : Controller
         selectedcar.Taken = true;
         
         _db.SaveChanges();
-        datatoreturn.ItemID = _db.Cars.ToList().Find(x => x.ID == selectedcar.CarKey).VehicleID;
+        datatoreturn.ItemID = (int)_db.Cars.ToList().Find(x => x.ID == selectedcar.CarKey).VehicleInstanceID;
         return JsonSerializer.Serialize(datatoreturn);
     }
 

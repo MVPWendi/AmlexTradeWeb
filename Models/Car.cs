@@ -11,6 +11,8 @@ namespace AmlexTradeWeb.Models
         public string Description { get; set; }
         public ulong OwnerID { get; set; }
         public ushort VehicleID { get; set; }
+
+        public uint VehicleInstanceID {get; set;}
         public bool Bought { get; set; }
     }
 }
