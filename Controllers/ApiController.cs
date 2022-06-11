@@ -60,21 +60,31 @@ public class ApiController : Controller
             Response.StatusCode = 401;
         }
         var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        if(user==null)
+        {
+            return "Code 2";
+        }
         user.MoneyAmount -= money;
+
         _db.SaveChanges();
         return "Code 1";
     }
     [HttpPost]
-    public string PutMoney(ulong steam, double money)
+    public async Task<string> PutMoney(ulong steam, double money)
     {
         if (Authorized(Response) == false)
         {
             Response.StatusCode = 401;
         }
         var user = _db.Users.ToList().Find(x => x.SteamID == steam);
-        if (user == null) _db.Users.Add(new User { MoneyAmount = 0, SteamID = steam });
+        if (user == null)
+        {
+            user = new User { MoneyAmount = 0, SteamID = steam };
+            _db.Users.Add(user);
+        }
+        
         user.MoneyAmount += money;
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         return "Code 1";
     }
     [HttpPost]
@@ -87,7 +97,7 @@ public class ApiController : Controller
         
         var item = await Request.ReadFromJsonAsync<Item>();
         _db.Items.Add(item);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         return "Code 1";
     }
     [HttpPost]
@@ -100,12 +110,12 @@ public class ApiController : Controller
 
         var car = await Request.ReadFromJsonAsync<Car>();
         _db.Cars.Add(car);
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         return "Code 1";
     }
 
     [HttpPost]
-    public string TakeCar(ulong steam, int number)
+    public async Task<string> TakeCar(ulong steam, int number)
     {
         if (Authorized(Response) == false)
         {
@@ -132,7 +142,7 @@ public class ApiController : Controller
         }
         selectedcar.Taken = true;
         
-        _db.SaveChanges();
+        await _db.SaveChangesAsync();
         datatoreturn.ItemID = (int)_db.Cars.ToList().Find(x => x.ID == selectedcar.CarKey).VehicleInstanceID;
         return JsonSerializer.Serialize(datatoreturn);
     }
