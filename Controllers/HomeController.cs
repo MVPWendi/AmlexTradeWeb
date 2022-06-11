@@ -26,7 +26,7 @@ public class HomeController : Controller
         return ulong.Parse(matches[0].Value);
     }
     [HttpGet]
-    public ActionResult Buy(int id)
+    public ActionResult BuyItem(int id)
     {
         Item item = db.Items.ToList().Find(x => x.ID == id);
         
@@ -40,6 +40,12 @@ public class HomeController : Controller
             return RedirectToAction($"123", "Home");
         }
         var seller = db.Users.ToList().Find(x => x.SteamID == item.OwnerID);
+        if (seller == null)
+        {
+            seller = new AmlexTradeWeb.Models.User { MoneyAmount = 0, SteamID = item.OwnerID };
+            db.Users.Add(seller);
+        }
+           
         user.MoneyAmount -= item.Cost;
         seller.MoneyAmount += item.Cost;
         item.Bought = true;
@@ -47,7 +53,33 @@ public class HomeController : Controller
         db.SaveChanges();
         return RedirectToAction($"Index", "Home");
     }
+    [HttpGet]
+    public ActionResult BuyCar(int id)
+    {
+        Car item = db.Cars.ToList().Find(x => x.ID == id);
 
+        if (item == null || User.Identity.IsAuthenticated == false)
+        {
+            return RedirectToAction($"123", "Home");
+        }
+        var user = db.Users.ToList().Find(x => x.SteamID == GetSteamID());
+        if (user.MoneyAmount < item.Cost)
+        {
+            return RedirectToAction($"123", "Home");
+        }
+        var seller = db.Users.ToList().Find(x => x.SteamID == item.OwnerID);
+        if (seller == null)
+        {
+            seller = new AmlexTradeWeb.Models.User { MoneyAmount = 0, SteamID = item.OwnerID };
+            db.Users.Add(seller);
+        }
+        user.MoneyAmount -= item.Cost;
+        seller.MoneyAmount += item.Cost;
+        item.Bought = true;
+        db.BoughtCars.Add(new BoughtCar { CarKey = item.ID, OwnerID = user.SteamID, SellerID = seller.SteamID, Taken = false });
+        db.SaveChanges();
+        return RedirectToAction($"Index", "Home");
+    }
     [HttpGet]
     public ActionResult Index()
     {
@@ -70,9 +102,11 @@ public class HomeController : Controller
                 db.Users.Add(new AmlexTradeWeb.Models.User { SteamID = ulong.Parse(matches[0].Value), MoneyAmount = 0 });
                 db.SaveChanges();
             }
-            var itemlist = db.Items.ToList();
+
+            var carsorted = from car in db.Cars where car.Bought == false select car;
             var sortedlist = from item in db.Items where item.Bought == false select item;
             ViewBag.Items = sortedlist;
+            ViewBag.Cars = carsorted;
         }
         return View();
     }

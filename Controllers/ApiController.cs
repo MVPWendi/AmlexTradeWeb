@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -51,30 +52,121 @@ public class ApiController : Controller
             return false;
         }
     }
-    [HttpPut]
-    public async Task<string> TakeMoney()
+    [HttpPost]
+    public string TakeMoney(ulong steam, double money)
     {
-        if (Authorized(Response)==false)
+        if (Authorized(Response) == false)
         {
             Response.StatusCode = 401;
         }
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        user.MoneyAmount -= money;
+        _db.SaveChanges();
+        return "Code 1";
+    }
+    [HttpPost]
+    public string PutMoney(ulong steam, double money)
+    {
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        if (user == null) _db.Users.Add(new User { MoneyAmount = 0, SteamID = steam });
+        user.MoneyAmount += money;
+        _db.SaveChanges();
+        return "Code 1";
+    }
+    [HttpPost]
+    public async Task<string> AddItem()
+    {
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        
         var item = await Request.ReadFromJsonAsync<Item>();
         _db.Items.Add(item);
         _db.SaveChanges();
         return "Code 1";
     }
-    public string PutMoney()
+    [HttpPost]
+    public async Task<string> AddCar()
     {
-        return "";
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+
+        var car = await Request.ReadFromJsonAsync<Car>();
+        _db.Cars.Add(car);
+        _db.SaveChanges();
+        return "Code 1";
     }
 
-    public string AddItem()
+    [HttpPost]
+    public string TakeCar(ulong steam, int number)
     {
-        return "";
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        TakeData datatoreturn = new TakeData { Car = true, Code = "Code 1", ItemID = 0 };
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        if (user == null)
+        {
+            datatoreturn.Code = "Code 2";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        var boughtcars = (from car in _db.BoughtCars where car.OwnerID == steam && car.Taken == false select car).ToList();
+        if(boughtcars.Count == 0)
+        {
+            datatoreturn.Code = "Code 3";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        var selectedcar = boughtcars[number];
+        if(selectedcar == null)
+        {
+            datatoreturn.Code = "Code 4";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        selectedcar.Taken = true;
+        
+        _db.SaveChanges();
+        datatoreturn.ItemID = _db.Cars.ToList().Find(x => x.ID == selectedcar.CarKey).VehicleID;
+        return JsonSerializer.Serialize(datatoreturn);
     }
 
-    public string RemoveItem()
+    [HttpPost]
+    public string TakeItem(ulong steam, int number)
     {
-        return "";
+        if (Authorized(Response) == false)
+        {
+            Response.StatusCode = 401;
+        }
+        TakeData datatoreturn = new TakeData { Car = false, Code = "Code 1", ItemID = 0 };
+        var user = _db.Users.ToList().Find(x => x.SteamID == steam);
+        if (user == null)
+        {
+            datatoreturn.Code = "Code 2";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        var boughtitems = (from item in _db.BoughtItems where item.OwnerID == steam && item.Taken == false select item).ToList();
+        if (boughtitems.Count == 0)
+        {
+            datatoreturn.Code = "Code 3";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        var selecteditem = boughtitems[number];
+        if (selecteditem == null)
+        {
+            datatoreturn.Code = "Code 4";
+            return JsonSerializer.Serialize(datatoreturn);
+        }
+        selecteditem.Taken = true;
+
+        _db.SaveChanges();
+        datatoreturn.ItemID = _db.Items.ToList().Find(x => x.ID == selecteditem.ItemKey).ItemID;
+        return JsonSerializer.Serialize(datatoreturn);
     }
 }
