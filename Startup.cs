@@ -62,6 +62,7 @@ namespace AmlexTradeWeb
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action}");
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Wiki}/{action=Plugin}/{Name}");
                 endpoints.MapDefaultControllerRoute();
             });
         }
