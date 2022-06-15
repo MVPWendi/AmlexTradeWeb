@@ -14,6 +14,8 @@ namespace AmlexTradeWeb.Models
 
         public DbSet<Plugin> Plugins { get; set; }
         public DbSet<Command> Commands { get; set; }
+        
+        public DbSet<FileModel> Files { get; set; }
         public ForumDB(DbContextOptions<ForumDB> options)
             : base(options)
         {
