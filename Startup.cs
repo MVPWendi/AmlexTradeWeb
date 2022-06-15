@@ -61,8 +61,9 @@ namespace AmlexTradeWeb
             //app.UseMiddleware<AuthenticationMiddleware>();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action}");
-                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Wiki}/{action=Plugin}/{Name}");
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute(name: "wikiplugins", pattern: "{controller=Wiki}/{action=Plugin}/{Name}");
+                endpoints.MapControllerRoute(name: "defaultwiki", pattern: "{controller=Wiki}/{action=Index}");
                 endpoints.MapDefaultControllerRoute();
             });
         }

@@ -11,6 +11,9 @@ namespace AmlexTradeWeb.Models
         
         public DbSet<BoughtItem> BoughtItems { get; set; }
         public DbSet<BoughtCar> BoughtCars { get; set; }
+
+        public DbSet<Plugin> Plugins { get; set; }
+        public DbSet<Command> Commands { get; set; }
         public ForumDB(DbContextOptions<ForumDB> options)
             : base(options)
         {
