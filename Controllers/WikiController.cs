@@ -22,9 +22,23 @@ public class WikiController : Controller
         _db = DB;
     }
 
-    public async void Plugin(string Name)
+    public IActionResult Plugin(string Name)
     {
+        var plugin = _db.Plugins.FirstOrDefault(x => x.Name == Name);
+        var commands = from com in _db.Commands where com.PluginName == Name select com;
+        WikiPluginInfo WI = new WikiPluginInfo();
+        WI.Commands = commands.ToList();
+        WI.Plugin = plugin;
+        return View(WI);
+    }
+    public IActionResult Index()
+    {
+        return View();
+    }
+    public IActionResult Plugins()
+    {
+        var plugins = _db.Plugins.ToList();
+        return View(plugins);
 
-       await HttpContext.Response.WriteAsync(Name);
     }
 }

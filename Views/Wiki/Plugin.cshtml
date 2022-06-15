@@ -1,0 +1,13 @@
+﻿
+@using AmlexTradeWeb.Models
+
+@model WikiPluginInfo
+<div class="jumbotron">
+    @Model.Plugin.Name
+    @Model.Plugin.Description
+    @foreach(Command com in Model.Commands)
+    {
+        <p>@com.Name</p>
+        <p>@com.Description</p>
+    }
+</div>
