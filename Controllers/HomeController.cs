@@ -26,7 +26,7 @@ public class HomeController : Controller
         return ulong.Parse(matches[0].Value);
     }
     [HttpGet]
-    public ActionResult BuyItem(int id)
+    public IActionResult BuyItem(int id)
     {
         Item item = db.Items.ToList().Find(x => x.ID == id);
         
@@ -81,7 +81,7 @@ public class HomeController : Controller
         return RedirectToAction($"Index", "Home");
     }
     [HttpGet]
-    public ActionResult Index()
+    public IActionResult Index(string Shop)
     {
         if (User.Identity.IsAuthenticated)
         {
@@ -103,11 +103,33 @@ public class HomeController : Controller
                 db.SaveChanges();
             }
 
-            var carsorted = from car in db.Cars where car.Bought == false select car;
-            var sortedlist = from item in db.Items where item.Bought == false select item;
-            ViewBag.Items = sortedlist;
-            ViewBag.Cars = carsorted;
+            
+            if(Shop=="Item")
+            {
+                var sortedlist = from item in db.Items where item.Bought == false select item;
+                ViewBag.Items = sortedlist.ToList();
+                return View();
+            }
+            if(Shop=="Car")
+            {
+                var carsorted = from car in db.Cars where car.Bought == false select car;
+                ViewBag.Cars = carsorted.ToList();
+                return View();
+            }
         }
         return View();
+    }
+
+    [HttpGet]
+    public IActionResult Carshop()
+    {
+        var carsorted = from car in db.Cars where car.Bought == false select car;
+        return View(carsorted);
+    }
+    [HttpGet]
+    public IActionResult ItemShop()
+    {
+        var sortedlist = from item in db.Items where item.Bought == false select item;
+        return View(sortedlist);
     }
 }

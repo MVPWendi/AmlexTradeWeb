@@ -5,40 +5,7 @@
     
     @if (User?.Identity?.IsAuthenticated ?? false)
     {
-        <h1>Items</h1>
-        @foreach (Item item in ViewBag.Items)
-        {
-        <div class="sellitem">
-            <div class="id" asp-for="id">@item.ID</div>
-            <input asp-for="id" value="@item.ID" type="hidden" />
-            <div class="cost">@item.Cost</div>
-            <div class="name">@item.Name</div>
-            <div class="item_id">@item.ItemID</div>
-            <a href="~/Home/BuyItem/@item.ID">Купить</a>
-        </div>
-        }
-        <h1>Cars</h1>
-        @foreach (Car item in ViewBag.Cars)
-        {
-        <div class="sellitem">
-            <div class="id" asp-for="id">@item.ID</div>
-            <input asp-for="id" value="@item.ID" type="hidden" />
-            <div class="cost">@item.Cost</div>
-            <div class="name">@item.Name</div>
-            <div class="item_id">@item.VehicleID</div>
-            <a href="~/Home/BuyCar/@item.ID">Купить</a>
-        </div>
-        }
-        <h1>Welcome, @User.Identity.Name</h1>
-
-        <p>
-            @foreach (var claim in Context.User.Claims)
-            {
-                <div><code>@ViewBag.SteamURL</code>: <strong>@claim.Value</strong></div>
-            }
-        </p>
-
-        <a class="btn btn-lg btn-danger" href="/signout?returnUrl=%2F">Sign out</a>
+         <a class="btn btn-lg btn-danger" href="/signout?returnUrl=%2F">Sign out</a>
     }
 
     else
@@ -47,3 +14,7 @@
         <a class="btn btn-lg btn-success" href="/signin?returnUrl=%2F">Sign in</a>
     }
 </div>
+
+
+
+

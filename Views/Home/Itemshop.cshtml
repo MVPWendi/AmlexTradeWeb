@@ -1,0 +1,23 @@
+﻿
+@using AmlexTradeWeb.Models
+@model IQueryable<Item>
+<div class="jumbotron">
+       <h1>Items</h1>
+    @if(Model.Count()>0)
+    {
+        @foreach (Item item in Model)
+        {
+            <div class="sellitem">
+                <div class="id" asp-for="id">@item.ID</div>
+                <input asp-for="id" value="@item.ID" type="hidden" />
+                <div class="cost">@item.Cost</div>
+                <div class="name">@item.Name</div>
+                <div class="item_id">@item.ItemID</div>
+                @if (User?.Identity?.IsAuthenticated ?? false)
+                {
+                    <a href="~/Home/BuyCar/@item.ID">Купить</a>
+                }
+            </div>
+        }
+    }
+</div>
